@@ -4,34 +4,25 @@
 #: Author : LSW <pro_4701@naver.com>
 #: Version  : 1.1
 #: Description : : Hi
-
 echo "============================================"
 echo " create MineOps EKS create script  "
 echo " module.cluster.aws_eks_cluster.this: Still creating... [10m50s elapsed] "
 echo " EKS 리소스 생성과정에서 10분 이상 시간 소모 "
-date +%Y-%m-%d
-
-# aws sts get-caller-identity 
 
 DIR="$( cd "$( dirname "$0" )" && pwd -P )"
 echo $DIR
-
 cd $DIR/env/terraform-aws-ubuntu/network ; terraform init
 terraform apply -auto-approve
-
 cd $DIR/env/ec2/ec2-instance ; terraform init
 terraform apply -auto-approve
-
-
 cd $DIR/env/terraform-eks/3-irsa ; terraform init
 terraform apply -auto-approve
 aws eks update-kubeconfig --region ap-northeast-2 --name apne2-mineops --alias apne2-mineops
-# EKS연결을 위해 ~/.kube/config 파일 내 클러스터 연결 정보를 추가연결하는 과정 
 
+# EKS연결을 위해 ~/.kube/config 파일 내 클러스터 연결 정보를 추가연결하는 과정 
 irsa_arn="$(terraform output irsa_arn)"
 alb_arn="$(terraform output alb_arn)"
-
-###########################################################################################  arn 교환 
+#####################################################################    arn 교환 
 cd $DIR/eks-irsa
 echo $irsa_arn > arn_tmp
 sed -i "s/role/role\\\/1" ./arn_tmp   # role -> role\/    이스케이프 전처리   
